@@ -4,15 +4,162 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="micaiahskolnick.timesheethelper2.MainActivity">
+    tools:context="micaiahskolnick.timesheethelper2.micaiahskolnick.timesheethelper.MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:layout_width="356dp"
+        android:layout_height="495dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="13dp"
+        tools:layout_editor_absoluteY="13dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="right"
+            android:orientation="horizontal"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp">
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.07"
+                android:gravity="right"
+                android:text="Enter your timesheet goal:"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/goal_Box"
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.24"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="number|numberDecimal"
+                android:text="20"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                tools:layout_editor_absoluteX="142dp"
+                tools:layout_editor_absoluteY="42dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.26"
+                android:gravity="right"
+                android:text="Enter your current total:"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <EditText
+                android:id="@+id/curr_Box"
+                android:layout_width="52dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.23"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="number|numberDecimal"
+                android:textAppearance="@android:style/TextAppearance.Material.Large"
+                tools:layout_editor_absoluteX="142dp"
+                tools:layout_editor_absoluteY="42dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/results_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Your time needed is:"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="202dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:paddingRight="5dp"
+                    android:text="Hours:"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+                <TextView
+                    android:id="@+id/time_needed_hours"
+                    android:layout_width="202dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textView10"
+                    android:layout_width="202dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:paddingRight="5dp"
+                    android:text="Minutes:"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+                <TextView
+                    android:id="@+id/time_needed_minutes"
+                    android:layout_width="202dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="left"
+                    android:textAppearance="@android:style/TextAppearance.Material.Large" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+
 
 </android.support.constraint.ConstraintLayout>
