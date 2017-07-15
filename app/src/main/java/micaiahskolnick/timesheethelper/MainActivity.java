@@ -4,16 +4,23 @@ import android.content.SharedPreferences;
 
 
 import java.util.Calendar;
+
+import android.provider.AlarmClock;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,8 +28,6 @@ public class MainActivity extends AppCompatActivity {
     To do list
 
     *Set to display doubele "0" when an exact hour is hit
-
-
 
      */
 
@@ -46,8 +51,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView hoursHeading;
     private TextView minutesHeading;
     private LinearLayout resultsLayout;
-    private Button AmPmBtn;
+    private ToggleButton AmPmBtn;
+    private Button NowBtn;
     private Calendar calendar;
+    private AlarmClock alarmClock;
 
 
 
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private String timeNeededHoursStr;
     private String timeNeededMinutesStr;
     String clockOutTimeStr;
+    private Button AlarmBtn;
 
     public void updateDisplay(){
         getNumbers();
@@ -74,13 +82,13 @@ public class MainActivity extends AppCompatActivity {
         updateClockOutTime();
     }
     private void updateClockOutTime(){
-        if(getClockOutTime()) {
+        if(getClockInTime()) {
             calculateClockOutTime();
             updateClockOutDisplay();
         }
 
     }
-    private boolean getClockOutTime(){
+    private boolean getClockInTime(){
         try {
             clockInTimeHrDouble = Double.parseDouble(clockInTimeHr.getText().toString());
         }
@@ -102,9 +110,10 @@ public class MainActivity extends AppCompatActivity {
         int clockOutTimeHrInt;
         int clockOutTimeMinInt;
         boolean PM = true;
-        if(AmPmBtn.isActivated()){
+        if(AmPmBtn.isChecked()){
             PM = false;
         }
+
 
         clockOutTimeHrInt = (int) clockInTimeHrDouble + neededHoursInt;
         clockOutTimeMinInt = (int) clockInTimeMinDouble + neededMinInt;
@@ -125,7 +134,13 @@ public class MainActivity extends AppCompatActivity {
 
 
             //Concatenate all of the pieces of clock out time together to one string.
-        clockOutTimeStr = clockOutTimeStr.concat(":").concat(Integer.toString(clockOutTimeMinInt));
+
+        if(clockOutTimeMinInt < 10){ //If the minutes are one integer, add a 0 before it.
+            clockOutTimeStr = clockOutTimeStr.concat(":0").concat(Integer.toString(clockOutTimeMinInt));
+        }
+        else{ //If the minutes are two integers long, don't add any numbers before the minutes
+            clockOutTimeStr = clockOutTimeStr.concat(":").concat(Integer.toString(clockOutTimeMinInt));
+        }
         if(PM){
             clockOutTimeStr = clockOutTimeStr.concat(" PM");
         }
@@ -140,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
     }
     private void setCurrentTimeAsClockInTime(){
         int currentHour,currentMinute;
+        String currentMinuteStr;
         Calendar.getInstance();
 
         Time currentTime = new Time();
@@ -147,14 +163,23 @@ public class MainActivity extends AppCompatActivity {
         currentHour = currentTime.hour;
         if(currentHour > 12){
             currentHour -=12;
-            AmPmBtn.setSelected(false);
+            AmPmBtn.setChecked(false);
         }
         else{
-            AmPmBtn.setSelected(true);
+            AmPmBtn.setChecked(true);
         }
         currentMinute = currentTime.minute;
+
+        if(currentMinute < 10){ //If the current minute is one integer in length, add a 0 before it
+            currentMinuteStr = "0";
+            currentMinuteStr = currentMinuteStr.concat(Integer.toString(currentMinute));
+        }
+        else{ //If the current minute is not less than 0, don't add a 0
+            currentMinuteStr = Integer.toString(currentMinute);
+        }
+            //Set both the clock-in time hour and minute
         clockInTimeHr.setText(Integer.toString(currentHour));
-        clockInTimeMin.setText(Integer.toString(currentMinute));
+        clockInTimeMin.setText(currentMinuteStr);
     }
     private void showOrHideResults(){
         try {
@@ -181,7 +206,6 @@ public class MainActivity extends AppCompatActivity {
             current = 0;
         }
     }
-
     public void calculateTimeNeeded(){
         needed = goal - current;
         neededMinutes = needed*60;
@@ -198,12 +222,10 @@ public class MainActivity extends AppCompatActivity {
         timeNeededHoursBox.setText(timeNeededHoursStr);
         timeNeededMinutesBox.setText(timeNeededMinutesStr);
     }
-
     public void clearBox(EditText thisBox){
         thisBox.setText("");
         updateDisplay();
     }
-
 
     @Override
     public void onPause() {
@@ -216,6 +238,10 @@ public class MainActivity extends AppCompatActivity {
         preferenceEditor.putString("savedGoal",goalStr);
         preferenceEditor.putString("savedCurr",currStr);
 
+        preferenceEditor.putString("savedClockInHr",clockInTimeHr.getText().toString());
+        preferenceEditor.putString("savedClockInMin",clockInTimeMin.getText().toString());
+        preferenceEditor.putString("savedClockOutTime",clockOutTimeStr);
+
         // Apply the edits!
         preferenceEditor.apply();
     }
@@ -223,10 +249,11 @@ public class MainActivity extends AppCompatActivity {
     public void onResume() {
         super.onResume();  // Always call the superclass method first
 
-        String savedGoal = preferenceSettings.getString("savedGoal","");
-        String savedCurr = preferenceSettings.getString("savedCurr","");
-        goalBox.setText(savedGoal);
-        currBox.setText(savedCurr);
+        goalBox.setText(preferenceSettings.getString("savedGoal",""));
+        currBox.setText(preferenceSettings.getString("savedCurr",""));
+        clockInTimeHr.setText(preferenceSettings.getString("savedClockInHr",""));
+        clockInTimeMin.setText(preferenceSettings.getString("savedClockInMin",""));
+        clockOutTime.setText(preferenceSettings.getString("savedClockOutTime",""));
 
         getNumbers();
         if(current < 0.0000001){ //If current is 0, clear the box
@@ -236,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
             goalBox.setText("40");
         }
         currBox.requestFocus(); //Put the focus on the box for current total
-        setCurrentTimeAsClockInTime();
+
 
     }
 
@@ -257,8 +284,11 @@ public class MainActivity extends AppCompatActivity {
         clockInTimeHr = (EditText) findViewById(R.id.clock_in_time_hr);
         clockInTimeMin = (EditText) findViewById(R.id.clock_in_time_min);
         clockOutTime = (EditText) findViewById(R.id.clock_out_time);
-        AmPmBtn = (Button) findViewById(R.id.am_pm_btn);
+        AmPmBtn = (ToggleButton) findViewById(R.id.am_pm_btn);
+        NowBtn = (Button) findViewById(R.id.now_btn);
+        AlarmBtn = (Button) findViewById(R.id.alarm_btn);
         resultsLayout = (LinearLayout) findViewById(R.id.results_layout);
+        //alarmClock = new(AlarmClock);
 
         currBox.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -356,7 +386,29 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+        AmPmBtn.setOnCheckedChangeListener( new CompoundButton.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton toggleButton, boolean isChecked)
+            {
+                updateDisplay();
+            }
+        });
+        NowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setCurrentTimeAsClockInTime();
+                updateDisplay();
+            }
+        });
+        AlarmBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Toast.makeText(getApplicationContext(), "google", Toast.LENGTH_LONG).show();
 
+                Snackbar.make(getCurrentFocus(), "'SetAlarm' is currently disabled (Coming Soon)", Snackbar.LENGTH_LONG).show();
 
+            }
+        });
     }
 }
