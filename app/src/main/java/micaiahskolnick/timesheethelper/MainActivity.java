@@ -1,10 +1,15 @@
 package micaiahskolnick.timesheethelper;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 
 
 import java.util.Calendar;
 
+import android.os.SystemClock;
 import android.provider.AlarmClock;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -68,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
     private double clockInTimeHrDouble;
     private int neededHoursInt;
     private int neededMinInt;
+    private int timeNeededMS;
     private String goalStr;
     private String timeNeededHoursStr;
     private String timeNeededMinutesStr;
@@ -86,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
             calculateClockOutTime();
             updateClockOutDisplay();
         }
-
     }
     private boolean getClockInTime(){
         try {
@@ -105,15 +110,12 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
     private void calculateClockOutTime(){
-
-
         int clockOutTimeHrInt;
         int clockOutTimeMinInt;
         boolean PM = true;
         if(AmPmBtn.isChecked()){
             PM = false;
         }
-
 
         clockOutTimeHrInt = (int) clockInTimeHrDouble + neededHoursInt;
         clockOutTimeMinInt = (int) clockInTimeMinDouble + neededMinInt;
@@ -132,7 +134,6 @@ public class MainActivity extends AppCompatActivity {
 
         clockOutTimeStr = Integer.toString(clockOutTimeHrInt);
 
-
             //Concatenate all of the pieces of clock out time together to one string.
 
         if(clockOutTimeMinInt < 10){ //If the minutes are one integer, add a 0 before it.
@@ -149,6 +150,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
+    }
+    private void calculateTimeNeededMS(){
+        timeNeededMS =0;
+        timeNeededMS += neededHoursInt*60*60*1000;
+        timeNeededMS += neededMinInt*60*1000;
     }
     private void updateClockOutDisplay(){
         clockOutTime.setText(clockOutTimeStr);
@@ -263,8 +269,6 @@ public class MainActivity extends AppCompatActivity {
             goalBox.setText("40");
         }
         currBox.requestFocus(); //Put the focus on the box for current total
-
-
     }
 
     @Override
@@ -405,10 +409,29 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(), "google", Toast.LENGTH_LONG).show();
+                calculateTimeNeededMS();
 
-                Snackbar.make(getCurrentFocus(), "'SetAlarm' is currently disabled (Coming Soon)", Snackbar.LENGTH_LONG).show();
+                startAlarm(true,false);
+
+                Snackbar.make(getCurrentFocus(), "Alarm set for "+clockOutTimeStr, Snackbar.LENGTH_LONG).show();
+
+               // Snackbar.make(getCurrentFocus(), "'SetAlarm' is currently disabled (Coming Soon)", Snackbar.LENGTH_LONG).show();
 
             }
         });
+    }
+
+    private void startAlarm(boolean isNotification, boolean isRepeat) {
+
+        AlarmManager manager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        Intent myIntent;
+        PendingIntent pendingIntent;
+        myIntent = new Intent(MainActivity.this,AlarmNotificationReceiver.class);
+        pendingIntent = PendingIntent.getBroadcast(this,0,myIntent,0);
+
+        manager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime()+timeNeededMS,pendingIntent);
+
+
+
     }
 }
