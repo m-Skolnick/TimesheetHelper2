@@ -420,7 +420,7 @@ public class MainActivity extends AppCompatActivity {
 
                 startAlarm(true,false);
 
-                Snackbar.make(getCurrentFocus(), "Alarm set for "+clockOutTimeStr, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(getCurrentFocus(), "Alarm set for: "+clockOutTimeStr, Snackbar.LENGTH_LONG).show();
 
                // Snackbar.make(getCurrentFocus(), "'SetAlarm' is currently disabled (Coming Soon)", Snackbar.LENGTH_LONG).show();
 
