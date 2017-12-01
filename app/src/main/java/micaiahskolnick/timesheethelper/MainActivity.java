@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 
 import java.util.Calendar;
 
-import android.os.SystemClock;
 import android.provider.AlarmClock;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -17,14 +16,12 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.Time;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.ToggleButton;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,7 +70,9 @@ public class MainActivity extends AppCompatActivity {
     private double clockInTimeHrDouble;
     private int neededHoursInt;
     private int neededMinInt;
-    private int timeNeededMS;
+    private int timeNeededMillis;
+    private long clockInTimeMillis;
+    private long clockOutTimeMillis;
     private String goalStr;
     private String timeNeededHoursStr;
     private String timeNeededMinutesStr;
@@ -133,6 +132,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         clockOutTimeStr = Integer.toString(clockOutTimeHrInt);
+        clockOutTimeMillis = clockOutTimeHrInt*60*60*1000 + clockOutTimeMinInt*60*1000;
 
             //Concatenate all of the pieces of clock out time together to one string.
 
@@ -151,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    private void calculateTimeNeededMS(){
-        timeNeededMS =0;
-        timeNeededMS += neededHoursInt*60*60*1000;
-        timeNeededMS += neededMinInt*60*1000;
+    private void calculateTimeNeededMillis(){
+        timeNeededMillis =0;
+        timeNeededMillis += neededHoursInt*60*60*1000;
+        timeNeededMillis += neededMinInt*60*1000;
     }
     private void updateClockOutDisplay(){
         clockOutTime.setText(clockOutTimeStr);
@@ -165,14 +165,20 @@ public class MainActivity extends AppCompatActivity {
         Calendar.getInstance();
 
         Time currentTime = new Time();
+
         currentTime.setToNow();
         currentHour = currentTime.hour;
+        //Set the clock in time to the time on the minute
+        clockInTimeMillis = System.currentTimeMillis() - currentTime.second*1000;
         if(currentHour > 12){
             currentHour -=12;
             AmPmBtn.setChecked(false);
         }
         else{
             AmPmBtn.setChecked(true);
+        }
+        if(currentHour == 0){
+            currentHour = 12;
         }
         currentMinute = currentTime.minute;
 
@@ -219,6 +225,8 @@ public class MainActivity extends AppCompatActivity {
         neededMinutes =  neededMinutes - neededHours*60;
         neededHoursInt = (int) neededHours;
         neededMinInt = (int) neededMinutes;
+
+        calculateTimeNeededMillis();
     }
     public void setTimeNeededText(){
 
@@ -409,7 +417,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(), "google", Toast.LENGTH_LONG).show();
-                calculateTimeNeededMS();
 
                 startAlarm(true,false);
 
@@ -429,9 +436,7 @@ public class MainActivity extends AppCompatActivity {
         myIntent = new Intent(MainActivity.this,AlarmNotificationReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this,0,myIntent,0);
 
-        manager.set(AlarmManager.RTC_WAKEUP, SystemClock.elapsedRealtime()+timeNeededMS,pendingIntent);
-
-
+        manager.set(AlarmManager.RTC_WAKEUP, clockInTimeMillis+ timeNeededMillis,pendingIntent);
 
     }
 }
