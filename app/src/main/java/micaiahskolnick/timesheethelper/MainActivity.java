@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
     /*
     To do list
 
-    *Set to display doubele "0" when an exact hour is hit
+    *Set to display double "0" when an exact hour is hit
 
      */
 
@@ -418,11 +418,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 //Toast.makeText(getApplicationContext(), "google", Toast.LENGTH_LONG).show();
 
-                startAlarm(true,false);
+                startAlarm(true,true);
 
                 Snackbar.make(getCurrentFocus(), "Alarm set for "+clockOutTimeStr, Snackbar.LENGTH_LONG).show();
-
-               // Snackbar.make(getCurrentFocus(), "'SetAlarm' is currently disabled (Coming Soon)", Snackbar.LENGTH_LONG).show();
 
             }
         });
@@ -436,7 +434,9 @@ public class MainActivity extends AppCompatActivity {
         myIntent = new Intent(MainActivity.this,AlarmNotificationReceiver.class);
         pendingIntent = PendingIntent.getBroadcast(this,0,myIntent,0);
 
-        manager.set(AlarmManager.RTC_WAKEUP, clockInTimeMillis+ timeNeededMillis,pendingIntent);
+        AlarmManager.AlarmClockInfo AlarmInfo = new AlarmManager.AlarmClockInfo(clockInTimeMillis+timeNeededMillis,pendingIntent);
+        manager.setAlarmClock(AlarmInfo,pendingIntent);
+
 
     }
 }
